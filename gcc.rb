@@ -63,6 +63,7 @@ class Gcc < Formula
     # install multiple versions of GCC" section of the GCC FAQ:
     #     http://gcc.gnu.org/faq.html#multiple
     gcc_prefix = prefix + 'gcc'
+    version_suffix = version.to_s.slice(/\d\.\d/)
 
     args = [
       # Sandbox everything...
@@ -72,7 +73,7 @@ class Gcc < Formula
       # ...and the binaries...
       "--bindir=#{bin}",
       # ...which are tagged with a suffix to distinguish them.
-      "--program-suffix=-#{version.to_s.slice(/\d\.\d/)}",
+      "--program-suffix=-#{version_suffix}",
       "--with-gmp=#{gmp.opt_prefix}",
       "--with-mpfr=#{mpfr.opt_prefix}",
       "--with-mpc=#{libmpc.opt_prefix}",
@@ -138,5 +139,12 @@ class Gcc < Formula
       # Remove conflicting manpages in man7
       man7.rmtree
     end
+
+    # create links without version numbers
+    Dir[bin/"*"].each do |f|
+      c = File.basename f
+      ln_s f, bin/(c.sub("-#{version_suffix}",""))
+    end
+
   end
 end
